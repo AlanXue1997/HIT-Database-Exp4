@@ -88,7 +88,7 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
 {
 	char filename[40];
 	unsigned char *blkPtr, *bytePtr;
-	char ch;
+	unsigned char ch;
 
 	if (buf->numFreeBlk == 0)
 	{
@@ -107,7 +107,7 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
 	}
 
 	sprintf(filename, DIR, addr);
-	FILE *fp = fopen(filename, "r");
+	FILE *fp = fopen(filename, "rb");
 
 	if (!fp)
 	{
@@ -121,7 +121,8 @@ unsigned char *readBlockFromDisk(unsigned int addr, Buffer *buf)
 
 	while (bytePtr < blkPtr + buf->blkSize)
 	{
-		ch = fgetc(fp);
+		fread(&ch, sizeof(ch), 1, fp);
+		//ch = fgetc(fp);
 		*bytePtr = ch;
 		bytePtr++;
 	}
@@ -138,7 +139,7 @@ int writeBlockToDisk(unsigned char *blkPtr, unsigned int addr, Buffer *buf)
 	unsigned char *bytePtr;
 
 	sprintf(filename, DIR, addr);
-	FILE *fp = fopen(filename, "w");
+	FILE *fp = fopen(filename, "wb");
 
 	if (!fp)
 	{
@@ -147,7 +148,8 @@ int writeBlockToDisk(unsigned char *blkPtr, unsigned int addr, Buffer *buf)
 	}
 
 	for (bytePtr = blkPtr; bytePtr < blkPtr + buf->blkSize; bytePtr++)
-		fputc((int)(*bytePtr), fp);
+		//fputc((int)(*bytePtr), fp);
+		fwrite(bytePtr, sizeof(*bytePtr), 1, fp);
 
 	fclose(fp);
 	*(blkPtr - 1) = BLOCK_AVAILABLE;

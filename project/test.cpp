@@ -1,50 +1,41 @@
-/*
-* test.c
-* Zhaonian Zou
-* Harbin Institute of Technology
-* Jun 22, 2011
-*/
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "extmem.h"
 #include "init.h"
 
+void link_search(Buffer &buf) {
+	FILE *link_search_output = fopen("link_search.txt", "w");
+	int p;
+	unsigned char *blk;
+
+	FILE *r_link_index = fopen("../data/r_link.index", "r");
+	fscanf(r_link_index, "%d", &p);
+	fclose(r_link_index);
+	while ((blk = readBlockFromDisk(p, &buf)) != NULL)
+	{
+		int *arr = (int*)blk;
+		for (int i = 0; i < 7; ++i) {
+			if (arr[i * 2] == 40) {
+				fprintf(link_search_output, "%d %d\n", arr[i * 2], arr[i * 2 + 1]);
+			}
+		}
+		p = arr[2 * 7];
+		freeBlockInBuffer(blk, &buf);
+	}
+	fclose(link_search_output);
+}
+
 int main(int argc, char **argv)
 {
-	Buffer buf; /* A buffer */
-	init(&buf);
-	
-	unsigned char *blk; /* A pointer to a block */
-	int i = 0;
+	Buffer buf;
 
-	/* Get a new block in the buffer */
-	blk = getNewBlockInBuffer(&buf);
-
-	/* Fill data into the block */
-	*(int*)blk = 0xFF00FF00;
-	*(int*)(blk+4) = 0xEECCEECC;
-
-	/* Write the block to the hard disk */
-	if (writeBlockToDisk(blk, 31415926, &buf) != 0)
+	if (!initBuffer(520, 64, &buf))
 	{
-		perror("Writing Block Failed!\n");
+		perror("Buffer Initialization Failed!\n");
 		return -1;
 	}
 
-	/* Read the block from the hard disk */
-	if ((blk = readBlockFromDisk(31415926, &buf)) == NULL)
-	{
-		perror("Reading Block Failed!\n");
-		return -1;
-	}
-
-	/* Process the data in the block */
-	for (i = 0; i < 8; i++)
-		printf("%c", *(blk + i));
-
-	printf("\n");
-	printf("# of IO's is %d\n", buf.numIO); /* Check the number of IO's */
+	link_search(buf);
 
 	return 0;
 }
