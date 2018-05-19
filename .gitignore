@@ -3,7 +3,8 @@
 
 # Specific for this project by Alan
 *.blk
-*.INDEX
+*.index
+*.txt
 
 # User-specific files
 *.suo
