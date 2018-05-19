@@ -18,7 +18,7 @@
     <ClInclude Include="extmem.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="init.h">
+    <ClInclude Include="utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClCompile Include="test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="init.cpp">
+    <ClCompile Include="utils.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

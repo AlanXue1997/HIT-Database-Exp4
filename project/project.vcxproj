@@ -119,12 +119,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="extmem.h" />
-    <ClInclude Include="init.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="extmem.cpp" />
-    <ClCompile Include="init.cpp" />
     <ClCompile Include="test.cpp" />
+    <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />

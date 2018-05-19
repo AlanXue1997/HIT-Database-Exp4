@@ -1,8 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "extmem.h"
-#include "init.h"
+#include "utils.h"
 
+#define MAX_N 300
+
+/*
+	About Search
+*/
 void link_search(Buffer &buf) {
 	FILE *link_search_output = fopen("link_search.txt", "w");
 	int p;
@@ -194,19 +199,144 @@ void tree_search(Buffer &buf) {
 	fclose(tree_search_output);
 }
 
+void project(Buffer &buf) {
+	FILE *project_output = fopen("project.txt", "w");
+	int p;
+	int output[MAX_N];
+	int len = 0;
+	unsigned char *blk;
+
+	FILE *r_link_index = fopen("../data/r_link.index", "r");
+	fscanf(r_link_index, "%d", &p);
+	fclose(r_link_index);
+	while ((blk = readBlockFromDisk(p, &buf)) != NULL)
+	{
+		int *arr = (int*)blk;
+		for (int i = 0; i < 7; ++i) {
+			output[len++] = arr[i * 2];
+			//fprintf(link_search_output, "%d %d\n", arr[i * 2], arr[i * 2 + 1]);
+		}
+		p = arr[2 * 7];
+		freeBlockInBuffer(blk, &buf);
+	}
+
+	buble_sort(output, len);
+
+	fprintf(project_output, "%d\n", output[0]);
+	for (int i = 1; i < len; ++i) {
+		if (output[i] != output[i - 1]) {
+			fprintf(project_output, "%d\n", output[i]);
+		}
+	}
+
+	fclose(project_output);
+}
+
+void nest_loop_join(Buffer &buf) {
+	FILE *nest_output = fopen("nest_loop_join.txt", "w");
+	int p;
+	unsigned char *blk;
+
+	FILE *r_link_index = fopen("../data/r_link.index", "r");
+	fscanf(r_link_index, "%d", &p);
+	fclose(r_link_index);
+	while ((blk = readBlockFromDisk(p, &buf)) != NULL)
+	{
+		int *arr = (int*)blk;
+		for (int i = 0; i < 7; ++i) {//arr[i * 2], arr[i * 2 + 1]
+			FILE *s_link_index = fopen("../data/s_link.index", "r");
+			int p2;
+			unsigned char *blk2;
+			fscanf(s_link_index, "%d", &p2);
+			fclose(s_link_index);
+			while ((blk2 = readBlockFromDisk(p2, &buf)) != NULL)
+			{
+				int *arr2 = (int*)blk2;
+				for (int i2 = 0; i2 < 7; ++i2) {
+					if (arr2[i2 * 2] == arr[i * 2]) {
+						fprintf(nest_output, "%d %d %d %d\n", arr[i * 2], arr[i * 2 + 1], arr2[i2 * 2], arr2[i2 * 2 + 1]);
+					}
+				}
+				p2 = arr2[2 * 7];
+				freeBlockInBuffer(blk2, &buf);
+			}
+		}
+		p = arr[2 * 7];
+		freeBlockInBuffer(blk, &buf);
+	}
+
+	fclose(nest_output);
+}
+/*
+void sort_merge_join(Buffer &buf) {
+	FILE *sort_output = fopen("sort_merge_join.txt", "w");
+	int p, p2;
+	unsigned char *blk, *blk2;
+	int *arr, *arr2;
+	int i, i2;
+
+	FILE *r_link_index = fopen("../data/r_link.index", "r");
+	fscanf(r_link_index, "%d", &p);
+	fclose(r_link_index);
+	FILE *s_link_index = fopen("../data/s_link.index", "r");
+	fscanf(s_link_index, "%d", &p2);
+	fclose(s_link_index);
+	if ((blk = readBlockFromDisk(p, &buf)) != NULL) {
+		arr = (int*)blk;
+		i = 0;
+	}
+	else {
+		return;
+	}
+	if ((blk2 = readBlockFromDisk(p2, &buf)) != NULL) {
+		arr2 = (int*)blk2;
+		i2 = 0;
+	}
+	else {
+		return;
+	}
+
+
+	while ()
+	{
+		for (int i = 0; i < 7; ++i) {//arr[i * 2], arr[i * 2 + 1]
+			
+			
+			while ((blk2 = readBlockFromDisk(p2, &buf)) != NULL)
+			{
+				int *arr2 = (int*)blk2;
+				for (int i2 = 0; i2 < 7; ++i2) {
+					if (arr2[i2 * 2] == arr[i * 2]) {
+						fprintf(nest_output, "%d %d %d %d\n", arr[i * 2], arr[i * 2 + 1], arr2[i2 * 2], arr2[i2 * 2 + 1]);
+					}
+				}
+				p2 = arr2[2 * 7];
+				freeBlockInBuffer(blk2, &buf);
+			}
+		}
+		p = arr[2 * 7];
+		freeBlockInBuffer(blk, &buf);
+	}
+
+	fclose(nest_output);
+}
+*/
 int main(int argc, char **argv)
 {
 	Buffer buf;
 
-	if (!initBuffer(520, 64, &buf))
-	{
+	if (!initBuffer(520, 64, &buf)) {
 		perror("Buffer Initialization Failed!\n");
 		return -1;
 	}
 
 	//link_search(buf);
 	//binary_search(buf);
-	tree_search(buf);
+	//tree_search(buf);
+	
+	//project(buf);
+
+	nest_loop_join(buf);
 
 	return 0;
 }
