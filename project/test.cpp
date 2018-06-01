@@ -4,7 +4,7 @@
 #include "utils.h"
 
 #define MAX_N 300
-
+ 
 /*
 	About Search
 */
